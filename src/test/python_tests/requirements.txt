@@ -1,3 +1,0 @@
-pytest==5.2.4
-pytest-benchmark==3.2.2
-terminusdb-client
