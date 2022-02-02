@@ -9705,7 +9705,8 @@ geojson_point_schema('
 { "@type": "Class",
   "@id": "MultiPoint",
   "type": "MultiPoint_Type",
-  "coordinates" : {"@type":"Table", "@class": "xsd:decimal"}}
+  "coordinates" : {"@type":"Array", "@dimensions" : 2,
+                   "@class": "xsd:decimal"}}
 
 ').
 
