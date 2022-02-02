@@ -108,6 +108,10 @@ member_list(Validation_Object, O, L) :-
     database_instance(Validation_Object, Instance),
     graph_member_list(Instance, O, L).
 
+member_array(Validation_Object, O, A) :-
+    database_instance(Validation_Object, Instance),
+    graph_member_array(Instance, O, A).
+
 card_count(Validation_Object,S_Id,P_Id,N) :-
     % choose as existential anything free
     instance_layer(Validation_Object, Layer),
@@ -622,7 +626,7 @@ refute_object_type_(array(C),Validation_Object,Object,Witness) :-
     Witness = witness{
                   '@type': array_instance_not_of_class,
                   class: C,
-                  instance: O,
+                  object: O,
                   array: Object
               }.
 refute_object_type_(list(C),Validation_Object,Object,Witness) :-
@@ -644,19 +648,15 @@ refute_object_type_(table(C),Validation_Object,Object,Witness) :-
     ->  Witness = witness{'@type':not_a_valid_table,
                           class:C,
                           table:Object}
-    ;   member_list(Validation_Object, List_Elt, Object),
-        refute_object_type_(list(C),Validation_Object,List_Elt,List_Witness),
-        (   witness{'@type':not_a_valid_list} :< List_Witness
-        ->  Witness = witness{ '@type': table_list_malformed,
-                               class: C,
-                               list: List_Elt}
-        ;   witness{'@type':list_element_of_wrong_type,
-                    object: Elt} :< List_Witness,
+    ;   member_array(Validation_Object, Array_Elt, Object),
+        refute_object_type_(array(C),Validation_Object,Array_Elt,Array_Witness),
+        (   witness{'@type':array_element_not_of_class,
+                    object: Elt} :< Array_Witness,
             Witness = witness{
                           '@type': table_element_of_wrong_type,
                           class: C,
                           object: Elt,
-                          list: List_Elt,
+                          list: Array_Elt,
                           table: Object
                       }
         )

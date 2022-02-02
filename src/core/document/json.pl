@@ -1488,9 +1488,6 @@ json_triple_(JSON,Context,Triple) :-
         ;   get_dict('@container', Value, "@array")
         ->  get_dict('@value', Value, Array),
             array_id_key_context_triple(Array,ID,Key,Context,Triple)
-        ;   get_dict('@container', Value, "@table")
-        ->  get_dict('@value', Value, Table),
-            table_id_key_context_triple(Table,ID,Key,Context,Triple)
         ;   get_dict('@container', Value, "@set")
         ->  get_dict('@value', Value, Set),
             set_id_key_context_triple(Set,ID,Key,Context,Triple)
@@ -1499,27 +1496,53 @@ json_triple_(JSON,Context,Triple) :-
         )
     ).
 
-array_id_key_context_triple(List,ID,Key,Context,Triple) :-
-    array_index_id_key_context_triple(List,0,ID,Key,Context,Triple).
+level_predicate_name(Level, Predicate) :-
+    global_prefix_expand(sys:index, SYS_Index),
+    (   Level = 1
+    ->  Predicate = SYS_Index
+    ;   format(atom(Predicate), '~w~q', [SYS_Index,Level])
+    ).
 
-array_index_id_key_context_triple([H|T],Index,ID,Key,Context,Triple) :-
+array_id_key_context_triple(List,ID,Key,Context,Triple) :-
     get_dict('@base', Context, Base),
     atomic_list_concat([Base,'Array_'], Base_Array),
-    idgen_random(Base_Array,New_ID),
-    reference(H,HRef),
+    list_array_dimensions(List,Dimensions),
     global_prefix_expand(sys:'Array', SYS_Array),
     global_prefix_expand(sys:value, SYS_Value),
-    global_prefix_expand(sys:index, SYS_Index),
     global_prefix_expand(xsd:nonNegativeInteger, XSD_NonNegativeInteger),
     global_prefix_expand(rdf:type, RDF_Type),
-    (   Triple = t(ID, Key, New_ID)
+    idgen_random(Base_Array,New_ID),
+    length(Dimensions,N),
+    list_array_index_element(List,Indexes,Elt),
+    reference(Elt,Ref),
+    (   Triple = t(New_ID, SYS_Value, Ref)
+    ;   between(1,N,M),
+        level_predicate_name(M,SYS_Index),
+        nth1(M,Indexes,Index),
+        Triple = t(New_ID, SYS_Index, Index^^XSD_NonNegativeInteger)
+    ;   Triple = t(ID, Key, New_ID)
     ;   Triple = t(New_ID, RDF_Type, SYS_Array)
-    ;   Triple = t(New_ID, SYS_Value, HRef)
-    ;   Triple = t(New_ID, SYS_Index, Index^^XSD_NonNegativeInteger)
-    ;   Next_Index is Index + 1,
-        array_index_id_key_context_triple(T,Next_Index,ID,Key,Context,Triple)
-    ;   json_triple_(H,Context,Triple)
     ).
+
+/* for now assumes uniformity */
+list_array_dimensions([],[]).
+list_array_dimensions([H|T],Dimensions) :-
+    (   list_array_dimensions(H,D)
+    ->  Dimensions = [N|D]
+    ;   Dimensions = [N]
+    ),
+    length([H|T],N).
+
+list_array_index_element(List,Index,Element) :-
+    list_array_dimensions(List,Dimensions),
+    list_array_index_element(Dimensions,List,Rev_Index,Element),
+    reverse(Rev_Index,Index).
+
+list_array_index_element([],Elt,[],Elt).
+list_array_index_element([N|D],L,[I|Idx],Elt) :-
+    between(0,N,I),
+    nth0(I,L,S),
+    list_array_index_element(D,S,Idx,Elt).
 
 set_id_key_context_triple([H|T],ID,Key,Context,Triple) :-
     (   reference(H,HRef),
@@ -1533,22 +1556,6 @@ reference(Dict,ID) :-
     !.
 reference(Elt,V) :-
     value_json(V,Elt).
-
-table_id_key_context_triple([],ID,Key,_Context,t(ID,Key,RDF_Nil)) :-
-    global_prefix_expand(rdf:nil, RDF_Nil).
-table_id_key_context_triple([H|T],ID,Key,Context,Triple) :-
-    get_dict('@base', Context, Base),
-    atomic_list_concat([Base,'Cons/'], Base_Cons),
-    idgen_random(Base_Cons,New_ID),
-    (   Triple = t(ID,Key,New_ID)
-    ;   global_prefix_expand(rdf:type, RDF_Type),
-        global_prefix_expand(rdf:'List', RDF_List),
-        Triple = t(New_ID, RDF_Type, RDF_List)
-    ;   global_prefix_expand(rdf:first, RDF_First),
-        list_id_key_context_triple(H,New_ID,RDF_First,Context,Triple)
-    ;   global_prefix_expand(rdf:rest, RDF_Rest),
-        table_id_key_context_triple(T,New_ID,RDF_Rest,Context,Triple)
-    ).
 
 list_id_key_context_triple([],ID,Key,_Context,t(ID,Key,RDF_Nil)) :-
     global_prefix_expand(rdf:nil, RDF_Nil).

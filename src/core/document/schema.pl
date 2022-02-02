@@ -1,5 +1,6 @@
 :- module('document/schema', [
               graph_member_list/3,
+              graph_member_array/3,
               is_system_class/1,
               refute_schema/2,
               is_enum/2,
@@ -62,6 +63,9 @@ graph_member_list(Instance, O,L) :-
 graph_member_list(Instance, O,L) :-
     xrdf(Instance, L, rdf:rest, Cdr),
     graph_member_list(Instance,O,Cdr).
+
+graph_member_array(Instance, O, A) :-
+    xrdf(Instance, A, rdf:value, O).
 
 is_unit(Class) :-
     global_prefix_expand(sys:'Unit', Class).
@@ -619,6 +623,10 @@ refute_base_type(Type,_Witness) :-
 refute_base_type(Type,Witness) :-
     Witness = witness{ '@type': not_a_base_type,
                        type: Type }.
+
+is_array(Validation_Object,Type) :-
+    database_schema(Validation_Object,Schema),
+    xrdf(Schema, Type, rdf:type, sys:'Array').
 
 is_rdf_list(Validation_Object,Type) :-
     database_schema(Validation_Object,Schema),
