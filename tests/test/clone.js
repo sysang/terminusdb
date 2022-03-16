@@ -10,7 +10,7 @@ describe('clone', function () {
     // had a different error.
     for (let i = 0; i < 2; i++) {
       const r = await cmd.catch((result) => {
-        expect(result.code).to.equal(1)
+        expect(result.code).to.not.equal(0)
         expect(result.stdout).to.equal('')
         expect(result.stderr).to.match(/^Error: HTTP request failed with socket error: Connection refused/)
         return true
