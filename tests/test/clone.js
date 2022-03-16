@@ -1,3 +1,4 @@
+const fs = require('fs/promises')
 const exec = require('util').promisify(require('child_process').exec)
 const { expect } = require('chai')
 // const { util } = require('../lib')
@@ -8,7 +9,7 @@ describe('clone', function () {
   })
 
   after(async function () {
-    await exec('rm -rf ./storage')
+    await fs.rm('storage', { recursive: true })
   })
 
   it('fails with socket error', async function () {
