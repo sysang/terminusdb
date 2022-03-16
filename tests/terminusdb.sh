@@ -4,7 +4,7 @@ if [[ -x "../terminusdb" ]]; then
   ../terminusdb "$@"
 elif docker image inspect terminusdb/terminusdb-server:local > /dev/null; then
   docker run \
-    --name terminusdb \
+    --rm \
     --workdir /app/terminusdb/tests \
     terminusdb/terminusdb-server:local \
     /app/terminusdb/terminusdb \
