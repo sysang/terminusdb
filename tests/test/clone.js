@@ -3,6 +3,14 @@ const { expect } = require('chai')
 // const { util } = require('../lib')
 
 describe('clone', function () {
+  before(async function () {
+    await exec('./terminusdb.sh init --force')
+  })
+
+  after(async function () {
+    await exec('rm -r storage')
+  })
+
   it('fails with socket error', async function () {
     const cmd = exec('./terminusdb.sh clone --user=admin --password=root http://localhost:12345/admin/db')
     // We run this twice to make sure that the error is the same. Previously,
