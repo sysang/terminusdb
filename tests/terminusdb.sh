@@ -5,6 +5,7 @@ if [[ -x "../terminusdb" ]]; then
 elif docker image inspect terminusdb/terminusdb-server:local > /dev/null; then
   docker run \
     --rm \
+    --user $(id -u):$(id -g) \
     --workdir /app/terminusdb/tests \
     --volume $(pwd)/storage:/app/terminusdb/tests/storage \
     terminusdb/terminusdb-server:local \
