@@ -8,7 +8,7 @@ describe('clone', function () {
   })
 
   after(async function () {
-    await exec('rm -rf storage/*')
+    await exec('rm -rf ./storage')
   })
 
   it('fails with socket error', async function () {
