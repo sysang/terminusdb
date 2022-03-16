@@ -6,6 +6,7 @@ elif docker image inspect terminusdb/terminusdb-server:local > /dev/null; then
   docker run \
     --rm \
     --workdir /app/terminusdb/tests \
+    --volume $(pwd)/storage:/app/terminusdb/tests/storage \
     terminusdb/terminusdb-server:local \
     /app/terminusdb/terminusdb \
     "$@"
