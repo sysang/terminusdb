@@ -4,7 +4,7 @@ const { expect } = require('chai')
 
 describe('clone', function () {
   before(async function () {
-    await exec('./terminusdb.sh init --force')
+    await exec('./terminusdb.sh store init --force')
   })
 
   after(async function () {
