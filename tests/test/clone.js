@@ -8,7 +8,6 @@ describe('clone', function () {
   })
 
   after(async function () {
-    await exec('ls -l storage/*')
     await exec('rm -rf storage/*')
   })
 
