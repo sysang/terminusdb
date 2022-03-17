@@ -19,8 +19,10 @@ describe('clone', function () {
     const first = './terminusdb.sh clone --user=' + util.randomString() +
       ' --password=' + util.randomString()
     const lasts = [
-      ' http://localhost:65535/' + util.randomString(), // Connection refused
-      ' http://' + util.randomString() + ':65535/' + util.randomString(), // nodename nor servname provided
+      // Connection refused
+      ' http://localhost:65535/' + util.randomString(),
+      // Name or service not known
+      ' http://' + util.randomString() + ':65535/' + util.randomString(),
     ]
     // We run this at least twice to make sure that the error is the same.
     // Previously, the database would be created during the first run, and the
@@ -29,7 +31,6 @@ describe('clone', function () {
       const r = await exec(first + last).catch((result) => {
         expect(result.code).to.not.equal(0)
         expect(result.stdout).to.equal('')
-        console.error('result.stderr:', result.stderr)
         expect(result.stderr).to.match(/^Error: HTTP request failed with socket error/)
         return true
       })

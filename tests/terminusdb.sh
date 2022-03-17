@@ -28,6 +28,7 @@ if [[ $use_docker -eq 0 ]]; then
     fi
     docker run \
       --rm \
+      --net=host \
       --user $user \
       --volume $PWD:/app/terminusdb/tests \
       --workdir /app/terminusdb/tests \
