@@ -39,16 +39,15 @@ describe('clone', function () {
   })
 
   it('succeeds', async function () {
-    const defaults = agent.defaults()
-    const { path } = endpoint.db(defaults)
+    const { path } = endpoint.db(agent.defaults())
     // Create a database
     await db.create(agent, path).then(db.verifyCreateSuccess)
     // Clone the database
-    const dbSpec = defaults.orgName + '/' + defaults.dbName
-    const url = defaults.baseUrl + '/' + dbSpec
+    const dbSpec = agent.orgName + '/' + agent.dbName
+    const url = agent.baseUrl + '/' + dbSpec
     const r = await exec(
-      './terminusdb.sh clone --user=' + defaults.userName +
-      ' --password=' + defaults.password +
+      './terminusdb.sh clone --user=' + agent.user +
+      ' --password=' + agent.password +
       ' ' + url,
     )
     expect(r.stdout).to.match(new RegExp('Cloned: \'' + url + '\' into ' + dbSpec))
