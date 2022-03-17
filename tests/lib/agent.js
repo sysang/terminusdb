@@ -44,10 +44,10 @@ class Agent {
         request.set(insecureUserHeader, this.userName)
       })
     } else {
-      const pass = process.env.TERMINUSDB_PASS
-      assert(pass, 'Missing environment variable: TERMINUSDB_ACCESS_TOKEN, TERMINUSDB_INSECURE_USER_HEADER, or TERMINUSDB_PASS')
+      this.password = process.env.TERMINUSDB_PASS
+      assert(this.password, 'Missing environment variable: TERMINUSDB_ACCESS_TOKEN, TERMINUSDB_INSECURE_USER_HEADER, or TERMINUSDB_PASS')
       this.agent.use((request) => {
-        request.auth(this.userName, pass)
+        request.auth(this.userName, this.password)
       })
     }
     return this
@@ -55,9 +55,11 @@ class Agent {
 
   defaults () {
     return {
+      baseUrl: this.baseUrl,
       orgName: this.orgName,
       dbName: this.dbName,
       userName: this.userName,
+      password: this.password,
     }
   }
 
