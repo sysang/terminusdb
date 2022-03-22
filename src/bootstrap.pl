@@ -29,6 +29,7 @@ main :-
     initialize_flags,
     bootstrap_files,
     bootstrap_config_files,
+    load_test_files([make(all)]),
     qsave_program(terminusdb, [
                       foreign(save),
                       undefined(error),
